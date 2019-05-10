@@ -1,11 +1,11 @@
-type Board = Array<Array<number>>;
+export type Board = Array<Array<number>>;
 
-enum Player {
+export enum Player {
   ONE = 1,
   TWO
 }
 
-function createBoard(): Board {
+export function createBoard(): Board {
   let board = Array(8)
     .fill(0)
     .map(() => Array(8).fill(0));
@@ -16,7 +16,7 @@ function createBoard(): Board {
   return board;
 }
 
-function isValidMove(
+export function isValidMove(
   player: Player,
   board: Board,
   x: number,
@@ -73,15 +73,10 @@ function isValidMove(
   return false;
 }
 
-function makeMove(player: Player, board: Board, x: number, y: number): Board {
+export function makeMove(player: Player, board: Board, x: number, y: number): Board {
   let newBoard = board.map(row => row.slice());
   newBoard[x][y] = player;
   return newBoard;
 }
 
-let board = createBoard();
-console.log(isValidMove(Player.ONE, board, 4, 3));
-console.log(isValidMove(Player.ONE, board, 7, 3));
-console.log(isValidMove(Player.ONE, board, 7, 4));
-console.log(isValidMove(Player.TWO, board, 7, 4));
-console.log(isValidMove(Player.ONE, board, 3, 5));
+
