@@ -1,5 +1,7 @@
 export type Board = Array<Array<number>>;
 
+export type Position = { row: number; col: number };
+
 export enum Player {
   ONE = 1,
   TWO
@@ -16,67 +18,87 @@ export function createBoard(): Board {
   return board;
 }
 
+function isWithinBoundaries(row: number, col: number) {
+  return row >= 0 && row < 8 && col >= 0 && col < 8;
+}
+
+function copyBoard(board: Board) {
+  return board.map(row => row.slice());
+}
+
+function getFlipablePieces(
+  board: Board,
+  player: Player,
+  startPos: Position,
+  direction: { x: number; y: number }
+): Array<Position> {
+  let row = startPos.row + direction.x;
+  let col = startPos.col + direction.y;
+  let pieces = [];
+  while (isWithinBoundaries(row, col)) {
+    if (board[row][col] === 0) {
+      return [];
+    }
+
+    if (board[row][col] === player) {
+      break;
+    } else {
+      pieces.push({ row, col });
+    }
+
+    row += direction.x;
+    col += direction.y;
+  }
+  return pieces;
+}
+
 export function isValidMove(
   player: Player,
   board: Board,
-  x: number,
-  y: number
+  position: Position
 ): boolean {
-  if (board[x][y] !== 0) {
+  if (board[position.row][position.col] !== 0) {
     return false;
   }
 
-  let distance = 0;
-  // Search upper rows
-  for (let i = x - 1; i >= 0; i--) {
-    if (board[i][y] !== 0 && board[i][y] !== player) {
-      distance++;
-    }
-    if (board[i][y] === player && distance > 0) {
-      return true;
-    }
-  }
-
-  distance = 0;
-  // Search bottom rows
-  for (let i = x + 1; i < 8; i++) {
-    if (board[i][y] !== 0 && board[i][y] !== player) {
-      distance++;
-    }
-    if (board[i][y] === player && distance > 0) {
-      return true;
+  // i (rows), j (cols) determine the direction where the check will be performed
+  // For example, i = -1 and j = 0 means UP and i = 0; j = 1 means RIGHT.
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
+      const dir = { x: i, y: j };
+      if (getFlipablePieces(board, player, position, dir).length >= 1) {
+        return true;
+      }
     }
   }
-
-  distance = 0;
-  // Search left columns
-  for (let i = y - 1; i >= 0; i--) {
-    if (board[x][i] !== 0 && board[x][i] !== player) {
-      distance++;
-    }
-    if (board[x][i] === player && distance > 0) {
-      return true;
-    }
-  }
-
-  distance = 0;
-  // Search right columns
-  for (let i = y + 1; i < 8; i++) {
-    if (board[x][i] !== 0 && board[x][i] !== player) {
-      distance++;
-    }
-    if (board[x][i] === player && distance > 0) {
-      return true;
-    }
-  }
-
   return false;
 }
 
-export function makeMove(player: Player, board: Board, x: number, y: number): Board {
-  let newBoard = board.map(row => row.slice());
-  newBoard[x][y] = player;
+export function makeMove(
+  player: Player,
+  board: Board,
+  position: Position
+): Board {
+  let newBoard = copyBoard(board);
+  newBoard[position.row][position.col] = player;
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
+      const dir = { x: i, y: j };
+      getFlipablePieces(board, player, position, dir).forEach(
+        p => (newBoard[p.row][p.col] = player)
+      );
+    }
+  }
   return newBoard;
 }
 
-
+export function countPieces(board: Board, player: Player) {
+  return board.reduce((rowAcc, row) => {
+    return (
+      rowAcc +
+      row.reduce((cellAcc, cell) => {
+        return cell === player ? cellAcc + 1 : cellAcc;
+      }, 0)
+    );
+  }, 0);
+}
