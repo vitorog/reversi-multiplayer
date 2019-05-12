@@ -2,6 +2,8 @@ export type Board = Array<Array<number>>;
 
 export type Position = { row: number; col: number };
 
+type Direction = {x: number, y: number};
+
 export enum Player {
   ONE = 1,
   TWO
@@ -22,6 +24,10 @@ function isWithinBoundaries(row: number, col: number) {
   return row >= 0 && row < 8 && col >= 0 && col < 8;
 }
 
+export function getNextPlayer(player: Player) {
+  return Math.abs(player - 3);
+}
+
 function copyBoard(board: Board) {
   return board.map(row => row.slice());
 }
@@ -30,7 +36,7 @@ function getFlipablePieces(
   board: Board,
   player: Player,
   startPos: Position,
-  direction: { x: number; y: number }
+  direction: Direction
 ): Array<Position> {
   let row = startPos.row + direction.x;
   let col = startPos.col + direction.y;
@@ -52,6 +58,24 @@ function getFlipablePieces(
   return pieces;
 }
 
+type IterationHandler = (dir: Direction) => void;
+
+function iterateDirections(handler: IterationHandler) {
+  // i and j determine the directions to check for pieces
+  // for example, i = -1 and j = 0 means LEFT direction
+  // i = 0 and j = 1 means UP direction and so on
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
+      if(i == 0 && j == 0){
+        continue;
+      }
+
+      const dir = { x: i, y: j };
+      handler(dir);
+    }
+  }  
+}
+
 export function isValidMove(
   player: Player,
   board: Board,
@@ -61,17 +85,13 @@ export function isValidMove(
     return false;
   }
 
-  // i (rows), j (cols) determine the direction where the check will be performed
-  // For example, i = -1 and j = 0 means UP and i = 0; j = 1 means RIGHT.
-  for (let i = -1; i <= 1; i++) {
-    for (let j = -1; j <= 1; j++) {
-      const dir = { x: i, y: j };
-      if (getFlipablePieces(board, player, position, dir).length >= 1) {
-        return true;
-      }
+  let isValid = false;
+  iterateDirections((dir: Direction) => {
+    if (getFlipablePieces(board, player, position, dir).length >= 1) {
+      isValid = true;
     }
-  }
-  return false;
+  })
+  return isValid; 
 }
 
 export function makeMove(
@@ -81,24 +101,18 @@ export function makeMove(
 ): Board {
   let newBoard = copyBoard(board);
   newBoard[position.row][position.col] = player;
-  for (let i = -1; i <= 1; i++) {
-    for (let j = -1; j <= 1; j++) {
-      const dir = { x: i, y: j };
-      getFlipablePieces(board, player, position, dir).forEach(
-        p => (newBoard[p.row][p.col] = player)
-      );
-    }
-  }
+
+  iterateDirections((dir: Direction) => {
+    getFlipablePieces(board, player, position, dir).forEach(
+      p => (newBoard[p.row][p.col] = player)
+    );
+  })
+
   return newBoard;
 }
 
 export function countPieces(board: Board, player: Player) {
-  return board.reduce((rowAcc, row) => {
-    return (
-      rowAcc +
-      row.reduce((cellAcc, cell) => {
-        return cell === player ? cellAcc + 1 : cellAcc;
-      }, 0)
-    );
+  return board.reduce((acc, row) => {
+    return acc + row.filter(piece => piece === player).length;
   }, 0);
 }

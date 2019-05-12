@@ -2,10 +2,12 @@
   "name": "reversi",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/reversi.js",
+  "types": "build/reversi.d.ts",
   "scripts": {
     "test": "jest",
-    "start": "ts-node src/reversi.ts"
+    "start": "ts-node src/reversi.ts",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -19,5 +21,6 @@
     "@types/node": "^12.0.0",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
-  }
+  },
+  "files": ["build/**/*"]
 }
