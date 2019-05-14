@@ -43,11 +43,11 @@ function getFlipablePieces(
   let pieces = [];
   while (isWithinBoundaries(row, col)) {
     if (board[row][col] === 0) {
-      return [];
+      break;
     }
 
     if (board[row][col] === player) {
-      break;
+      return pieces;
     } else {
       pieces.push({ row, col });
     }
@@ -55,7 +55,7 @@ function getFlipablePieces(
     row += direction.x;
     col += direction.y;
   }
-  return pieces;
+  return [];
 }
 
 type IterationHandler = (dir: Direction) => void;

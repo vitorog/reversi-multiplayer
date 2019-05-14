@@ -10,10 +10,14 @@ import * as reversi from "./reversi";
 // 6 0 0 0 0 0 0 0 0
 // 7 0 0 0 0 0 0 0 0
 
+let board: reversi.Board = [];
+
+beforeEach(() => {
+  board = reversi.createBoard();
+});
+
 describe("reversi game", () => {
   it("should correctly identify valid moves", () => {
-    let board = reversi.createBoard();
-
     expect(
       reversi.isValidMove(reversi.Player.TWO, board, { row: 0, col: 0 })
     ).toBe(false);
@@ -57,14 +61,47 @@ describe("reversi game", () => {
     expect(reversi.countPieces(board, reversi.Player.TWO)).toBe(2);
   });
 
-  it("should correctly flip pieces", () => {
-    let board = reversi.createBoard();
-    let newBoard = reversi.makeMove(reversi.Player.ONE, board, {
-      row: 5,
-      col: 3
+  describe("flip pieces", () => {
+    it("When a valid move is made, it should correctly flip pieces", () => {
+      let board = reversi.createBoard();
+      let newBoard = reversi.makeMove(reversi.Player.ONE, board, {
+        row: 5,
+        col: 3
+      });
+      expect(newBoard[5][3]).toBe(reversi.Player.ONE);
+      expect(reversi.countPieces(newBoard, reversi.Player.ONE)).toBe(4);
+      expect(reversi.countPieces(newBoard, reversi.Player.TWO)).toBe(1);
     });
-    expect(newBoard[5][3]).toBe(reversi.Player.ONE);
-    expect(reversi.countPieces(newBoard, reversi.Player.ONE)).toBe(4);
-    expect(reversi.countPieces(newBoard, reversi.Player.TWO)).toBe(1);
+
+    // Test after finding a bug on "corners"
+    it("When a valid move is made, it should correctly flip pieces at corners", () => {
+      // Testing on corners
+      board[0][0] = 1;
+      board[0][1] = 2;
+      board[1][0] = 2;
+      board[1][1] = 1;
+      let newBoard = reversi.makeMove(reversi.Player.TWO, board, {
+        row: 2,
+        col: 1
+      });
+      // This piece was being flipped before, due to a bug
+      expect(newBoard[1][0]).toBe(reversi.Player.TWO);
+      expect(newBoard[1][1]).toBe(reversi.Player.TWO);
+    });
+
+    it("When an invalid move is made, it should NOT flip any pieces", () => {
+      // Testing on corners
+      board[0][0] = 1;
+      board[0][1] = 2;
+      board[1][0] = 2;
+      board[1][1] = 1;
+      let newBoard = reversi.makeMove(reversi.Player.ONE, board, {
+        row: 2,
+        col: 1
+      });
+
+      expect(newBoard[1][0]).toBe(reversi.Player.TWO);
+      expect(newBoard[1][1]).toBe(reversi.Player.ONE);
+    });
   });
 });
