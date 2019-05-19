@@ -2,7 +2,7 @@ export type Board = Array<Array<number>>;
 
 export type Position = { row: number; col: number };
 
-type Direction = {x: number, y: number};
+type Direction = { x: number; y: number };
 
 export enum Player {
   ONE = 1,
@@ -66,14 +66,14 @@ function iterateDirections(handler: IterationHandler) {
   // i = 0 and j = 1 means UP direction and so on
   for (let i = -1; i <= 1; i++) {
     for (let j = -1; j <= 1; j++) {
-      if(i == 0 && j == 0){
+      if (i == 0 && j == 0) {
         continue;
       }
 
       const dir = { x: i, y: j };
       handler(dir);
     }
-  }  
+  }
 }
 
 export function isValidMove(
@@ -85,13 +85,7 @@ export function isValidMove(
     return false;
   }
 
-  let isValid = false;
-  iterateDirections((dir: Direction) => {
-    if (getFlipablePieces(board, player, position, dir).length >= 1) {
-      isValid = true;
-    }
-  })
-  return isValid; 
+  return getValidMoves(board, player).some(move => move.col === position.col && move.row === position.row);
 }
 
 export function makeMove(
@@ -106,9 +100,28 @@ export function makeMove(
     getFlipablePieces(board, player, position, dir).forEach(
       p => (newBoard[p.row][p.col] = player)
     );
-  })
+  });
 
   return newBoard;
+}
+
+export function getValidMoves(board: Board, player: Player): Array<Position> {
+  const validMoves: Array<Position> = [];
+  for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 8; j++) {
+      if(board[i][j] !== 0){
+        continue;
+      }
+
+      const position = { row: i, col: j };
+      iterateDirections((dir: Direction) => {
+        if (getFlipablePieces(board, player, position, dir).length > 0) {
+          validMoves.push(position);
+        }
+      });
+    }
+  }
+  return validMoves;
 }
 
 export function countPieces(board: Board, player: Player) {

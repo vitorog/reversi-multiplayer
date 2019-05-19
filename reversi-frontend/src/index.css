@@ -5,46 +5,11 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  background-color: #282c34;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
-}
-
-table {
-  border-collapse: collapse;
-  background-color: green;
-}
-
-td {
-  padding: 20px;
-  border: 1px solid;
-  width: 2em;
-  height: 2em;
-}
-
-td:hover {
-  background-color: gray;
-}
-
-.piece {
-  width: 50% ;
-  height: 50%;
-  padding: 25%;
-  border-radius: 50%;
-}
-
-.player-one {  
-  background: black;  
- 
-}
-
-.player-two {
-  background-color: white;
-}
-
-.hud { 
-  width: 100px;
-  height: 50px;
 }

@@ -5,7 +5,9 @@ import {
   isValidMove,
   Player,
   makeMove,
-  getNextPlayer
+  getNextPlayer,
+  countPieces,
+  getValidMoves
 } from "reversi";
 
 class ReversiGame extends React.Component<
@@ -47,7 +49,7 @@ class ReversiGame extends React.Component<
   };
 
   handleNextClick = () => {
-    let nextIdx = Math.max(
+    let nextIdx = Math.min(
       this.state.boardIndex + 1,
       this.state.history.length - 1
     );
@@ -58,32 +60,66 @@ class ReversiGame extends React.Component<
     this.setState({ boardIndex: this.state.history.length - 1 });
   };
 
+  renderMenu() {
+    return (
+      <div className="column game-menu">
+        <div className="card">
+          <header className="card-header">
+            <p className="card-header-title">Game Status</p>
+          </header>
+          <div className="card-content">
+            <p>Player 1 Score: {countPieces(this.state.board, Player.ONE)}</p>
+            <p>Player 2 Score: {countPieces(this.state.board, Player.TWO)}</p>
+            <p>Player {this.state.player}'s turn</p>
+          </div>
+          <p>Move number: {this.state.boardIndex}</p>
+          <button className="button is-link" onClick={this.handlePreviousClick}>
+            Previous
+          </button>
+          <button className="button is-link" onClick={this.handleNextClick}>
+            Next
+          </button>
+          <button className="button is-link" onClick={this.handleCurrentClick}>
+            Current
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const boardToDisplay = this.state.history[this.state.boardIndex];
+    const validMoves = getValidMoves(this.state.board, this.state.player);
     return (
-      <div>
-        <span>Player {this.state.player}'s turn</span>
-
-        <table>
-          <tbody>
-            {boardToDisplay.map((row, rowIdx) => {
-              return (
-                <tr>
-                  {row.map((cell, colIdx) => (
-                    <td onClick={() => this.handleClick(rowIdx, colIdx)}>
-                      {cell === 1 && <div className="piece player-one" />}
-                      {cell === 2 && <div className="piece player-two" />}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        <button onClick={this.handlePreviousClick}>Previous</button>
-        <span>Move number: {this.state.boardIndex}</span>
-        <button onClick={this.handleNextClick}>Next</button>
-        <button onClick={this.handleCurrentClick}>Current</button>
+      <div className="columns">
+        {this.renderMenu()}
+        <div className="game-container column">
+          <table className="game-board">
+            <tbody>
+              {boardToDisplay.map((row, rowIdx) => {
+                return (
+                  <tr>
+                    {row.map((cell, colIdx) => (
+                      <td onClick={() => this.handleClick(rowIdx, colIdx)}>
+                        {cell === 0 &&
+                          validMoves.some(
+                            move => move.row === rowIdx && move.col === colIdx
+                          ) && (
+                            <div
+                              className={`piece move-indicator player-${
+                                this.state.player
+                              }`}
+                            />
+                          )}
+                        <div className={`piece player-${cell}`} />
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   }

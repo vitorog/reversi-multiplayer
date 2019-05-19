@@ -1,33 +1,69 @@
-.App {
-  text-align: center;
+body {
+  
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-  pointer-events: none;
-}
-
-.App-header {
-  background-color: #282c34;
+.container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   font-size: calc(10px + 2vmin);
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.game-menu {
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.game-menu .card {
+}
+
+.game-menu .card + .card {
+  margin-top: 10px;
+}
+
+.game-container { 
+}
+
+.game-board {
+  border-collapse: collapse;
+  background-color: green;
+  table-layout: fixed;
+  width:100%;
+}
+
+td {
+  padding: 20px;
+  border: 1px solid;
+  width: 3em;
+  height: 3em;
+}
+
+td:hover {
+  background-color: gray;
+}
+
+.piece {
+  position: relative;
+  border-radius: 50%;
+  top: 25%;
+  left: 25%;
+  width: 50% ;
+  padding: 25%;
+}
+
+.player-1 {  
+  background: black;  
+ 
+}
+
+.player-2 {
+  background-color: white;
+}
+
+.move-indicator {
+  top: 40%;
+  left: 40%;
+  width: 10%;
+  padding: 10%;
 }
